@@ -6,29 +6,32 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-api_key = os.getenv('API_KEY')
-url = (f'https://newsapi.org/v2/everything?q=tesla&'
-       f'sortBy=publishedAt&apiKey={api_key}')
+API_KEY = os.getenv('API_KEY')
+topic = 'tesla'
+url = (f'https://newsapi.org/v2/everything?q={topic}&'
+       f'sortBy=publishedAt&apiKey={API_KEY}')
 # 890603a55bfa47048e4490069ebee18c
 # 'https://finance.yahoo.com'
+params = {'language': 'en'}
 
-res = requests.get(url)
+res = requests.get(url, params)
 content = res.text
 data = res.json()
 
 receiver = os.getenv('RECEIVER')
 
 message_body = ''
-for index, art in enumerate(data['articles']):
+for index, art in enumerate(data['articles'][:20]):
     print(f'processing index {index}')
     if art['title'] is not None and art['description'] is not None \
             and art['url'] is not None:
-        message_body = (message_body + art['title'] + '\n' + art['description']
-                        + '\n' + art['url'] + '\n' + 80 * '~' + '\n')
+        message_body = (message_body + f'News {index}:' + art['title'] + '\n'
+                        + art['description'] + '\n' + art['url']
+                        + '\n' + 80 * '~' + '\n')
 
 
-print(dir(message_body))
-email_status = send_email(message_body, 'auto news', receiver)
+message_subject = "Today's news"
+email_status = send_email(message_body, message_subject, receiver)
 
 if email_status:
     print('Your email was sent successfully!')
