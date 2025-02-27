@@ -14,7 +14,9 @@ url = (f'https://newsapi.org/v2/everything?q={topic}&'
 # 'https://finance.yahoo.com'
 params = {'language': 'en'}
 
-res = requests.get(url, params)
+headers = {
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36'}
+res = requests.get(url, params, headers=headers)
 content = res.text
 data = res.json()
 
@@ -29,7 +31,6 @@ for index, art in enumerate(data['articles'][:20]):
                         + art['description'] + '\n' + art['url']
                         + '\n' + 80 * '~' + '\n')
 
-
 message_subject = "Today's news"
 email_status = send_email(message_body, message_subject, receiver)
 
@@ -37,6 +38,5 @@ if email_status:
     print('Your email was sent successfully!')
 else:
     print('Something went wrong, failed to send email...')
-
 
 print('Thanks for choosing us, have a nice day!')
